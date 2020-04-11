@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
@@ -113,6 +114,12 @@ func siteStatusHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+	port = fmt.Sprintf(":%s", port)
 
 	go store.fetchSitesStatuses()
 
@@ -130,5 +137,5 @@ func main() {
 	}()
 
 	http.HandleFunc("/", siteStatusHandler)
-	log.Fatal(http.ListenAndServe(":9090", nil))
+	log.Fatal(http.ListenAndServe(port, nil))
 }
